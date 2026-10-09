@@ -7,12 +7,15 @@ import (
 )
 
 // ansiDangerousRegex matches non-SGR ANSI escape sequences (OSC title hijacks, cursor movements, screen clear, etc.)
-// Preserves safe SGR text styling/color codes (ending in 'm', e.g. \x1b[32m for green).
-var ansiDangerousRegex = regexp.MustCompile(`\x1b\][^\x07\x1b]*[\x07\x1b\\]|\x1b\[[0-9;]*[a-zA-LN-Z]`)
+// Preserves safe SGR text styling/color codes ending in 'm' (e.g. \x1b[32m for green).
+var ansiDangerousRegex = regexp.MustCompile(`\x1b\][^\x07\x1b]*[\x07\x1b\\]|\x1b\[[0-9;]*[a-ln-zA-LN-Z]`)
 
 // Text strips dangerous terminal control characters from a string while preserving safe ANSI color codes.
 // If allowNewline is false, newlines (\r, \n) are replaced with spaces.
 func Text(s string, allowNewline bool) string {
+	// Normalize CRLF to LF first to prevent double-newline conversion
+	s = strings.ReplaceAll(s, "\r\n", "\n")
+
 	// Strip dangerous ANSI control sequences (keep SGR color codes ending in 'm')
 	cleaned := ansiDangerousRegex.ReplaceAllString(s, "")
 
@@ -32,6 +35,10 @@ func Text(s string, allowNewline bool) string {
 			sb.WriteString("    ") // Expand tab to 4 spaces for consistent width calculation
 			continue
 		}
+		// Strip Unicode Bidi override characters used in text direction spoofing (\u200E-\u200F, \u202A-\u202E, \u2066-\u2069)
+		if (r >= 0x200E && r <= 0x200F) || (r >= 0x202A && r <= 0x202E) || (r >= 0x2066 && r <= 0x2069) {
+			continue
+		}
 		// Strip ASCII control chars (0x00-0x1F, 0x7F except ESC 0x1B) and unicode control runes
 		if unicode.IsControl(r) && r != '\x1b' {
 			continue
@@ -43,8 +50,9 @@ func Text(s string, allowNewline bool) string {
 	if !allowNewline {
 		// Collapse multiple consecutive spaces created by newline replacement
 		res = collapseSpaces(res)
+		return strings.TrimSpace(res)
 	}
-	return strings.TrimSpace(res)
+	return res
 }
 
 // SingleLine cleans a string for single-line usage like headers, titles, or keys.
@@ -52,12 +60,13 @@ func SingleLine(s string) string {
 	return Text(s, false)
 }
 
-// Multiline cleans a multiline string value, preserving newlines while stripping control sequences.
+// Multiline cleans a multiline string value, preserving newlines and line indentation while stripping control sequences.
 func Multiline(s string) string {
-	lines := strings.Split(s, "\n")
+	normalized := strings.ReplaceAll(s, "\r\n", "\n")
+	lines := strings.Split(normalized, "\n")
 	var cleanedLines []string
 	for _, line := range lines {
-		cleaned := Text(line, false)
+		cleaned := Text(line, true)
 		cleanedLines = append(cleanedLines, cleaned)
 	}
 	return strings.Join(cleanedLines, "\n")
@@ -79,3 +88,4 @@ func collapseSpaces(s string) string {
 	}
 	return sb.String()
 }
+

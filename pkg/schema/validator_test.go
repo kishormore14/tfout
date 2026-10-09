@@ -99,3 +99,27 @@ func TestParseAndValidateOversizedInput(t *testing.T) {
 		t.Errorf("Unexpected error message: %v", err)
 	}
 }
+
+func TestDeterministicDetailsOrdering(t *testing.T) {
+	jsonInput := `{
+		"schema_version": "1.0",
+		"title": "Test",
+		"details": {
+			"Zebra": "1",
+			"Alpha": "2",
+			"Beta": "3"
+		}
+	}`
+	doc, err := schema.ParseAndValidate(strings.NewReader(jsonInput))
+	if err != nil {
+		t.Fatalf("Unexpected error: %v", err)
+	}
+	details := doc.OrderedDetails()
+	if len(details) != 3 {
+		t.Fatalf("Expected 3 details, got %d", len(details))
+	}
+	if details[0].Key != "Alpha" || details[1].Key != "Beta" || details[2].Key != "Zebra" {
+		t.Errorf("Details not sorted deterministically: %+v", details)
+	}
+}
+

@@ -3,6 +3,7 @@ package terraform
 import (
 	"encoding/json"
 	"fmt"
+	"math"
 	"sort"
 	"strings"
 
@@ -50,8 +51,8 @@ func FormatValue(val interface{}, sensitive bool, showSensitive bool) (string, b
 	case bool:
 		return fmt.Sprintf("%t", v), sensitive
 	case float64:
-		// Check if it's an integer
-		if v == float64(int64(v)) {
+		// Check if it's an integer within int64 bounds
+		if v >= float64(math.MinInt64) && v <= float64(math.MaxInt64) && v == float64(int64(v)) {
 			return fmt.Sprintf("%d", int64(v)), sensitive
 		}
 		return fmt.Sprintf("%g", v), sensitive

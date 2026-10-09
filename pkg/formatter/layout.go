@@ -6,12 +6,29 @@ import (
 	"unicode/utf8"
 )
 
-var stripAnsiRegex = regexp.MustCompile(`\x1b\[[0-9;]*[a-zA-Z]`)
+var stripAnsiRegex = regexp.MustCompile(`\x1b\][^\x07\x1b]*[\x07\x1b\\]|\x1b\[[0-9;]*[a-zA-Z]`)
 
-// VisibleWidth returns the visible character count of a string, ignoring ANSI escape codes.
+// VisibleWidth returns the visible terminal column count of a string, ignoring ANSI escape codes.
 func VisibleWidth(s string) int {
 	clean := stripAnsiRegex.ReplaceAllString(s, "")
-	return utf8.RuneCountInString(clean)
+	width := 0
+	for _, r := range clean {
+		width += runeWidth(r)
+	}
+	return width
+}
+
+// runeWidth estimates terminal display column width for a rune.
+func runeWidth(r rune) int {
+	// Control characters or zero-width
+	if r < 32 || (r >= 0x7F && r < 0xA0) {
+		return 0
+	}
+	// Common Emoji / Miscellaneous Symbols (e.g. ⚠, ✔, ✖, ℹ, •) and CJK ranges
+	if (r >= 0x2600 && r <= 0x27BF) || (r >= 0x1F300 && r <= 0x1F9FF) || (r >= 0x2E80 && r <= 0x9FFF) {
+		return 2
+	}
+	return 1
 }
 
 // WrapText wraps text into lines of at most maxLen visible characters.
@@ -100,3 +117,4 @@ func PadRight(s string, targetWidth int) string {
 	}
 	return s + strings.Repeat(" ", targetWidth-vw)
 }
+

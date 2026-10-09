@@ -37,6 +37,16 @@ func TestSingleLineSanitize(t *testing.T) {
 			input:    "Key:\tValue",
 			expected: "Key: Value",
 		},
+		{
+			name:     "Unicode Bidi override removal",
+			input:    "safe_file\u202Etxt.exe",
+			expected: "safe_filetxt.exe",
+		},
+		{
+			name:     "Windows CRLF handling",
+			input:    "Line1\r\nLine2",
+			expected: "Line1 Line2",
+		},
 	}
 
 	for _, tt := range tests {
@@ -50,11 +60,12 @@ func TestSingleLineSanitize(t *testing.T) {
 }
 
 func TestMultilineSanitize(t *testing.T) {
-	input := "\x1b[32mLine 1\x1b[0m\nLine 2\r\x07With Bell\nLine 3"
-	expected := "\x1b[32mLine 1\x1b[0m\nLine 2 With Bell\nLine 3"
+	input := "\x1b[32mLine 1\x1b[0m\r\n  Indented Line 2\r\x07With Bell\nLine 3"
+	expected := "\x1b[32mLine 1\x1b[0m\n  Indented Line 2 With Bell\nLine 3"
 
 	got := sanitize.Multiline(input)
 	if got != expected {
 		t.Errorf("Multiline(%q) = %q; want %q", input, got, expected)
 	}
 }
+

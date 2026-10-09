@@ -90,3 +90,21 @@ func TestParseEmptyOutputs(t *testing.T) {
 		t.Error("Expected error on empty input, got nil")
 	}
 }
+
+func TestFormatValueNumberFormatting(t *testing.T) {
+	valInt, _ := terraform.FormatValue(float64(42), false, false)
+	if valInt != "42" {
+		t.Errorf("Expected '42', got %q", valInt)
+	}
+
+	valFloat, _ := terraform.FormatValue(float64(42.5), false, false)
+	if valFloat != "42.5" {
+		t.Errorf("Expected '42.5', got %q", valFloat)
+	}
+
+	valHuge, _ := terraform.FormatValue(1e30, false, false)
+	if valHuge != "1e+30" && valHuge != "1e+30" {
+		t.Errorf("Expected scientific float representation for huge number, got %q", valHuge)
+	}
+}
+

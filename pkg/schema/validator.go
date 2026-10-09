@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"sort"
 	"strings"
 
 	"github.com/tfout/tfout/pkg/sanitize"
@@ -50,7 +51,14 @@ func (doc *RenderDocument) OrderedDetails() []Detail {
 
 	if len(doc.DetailsMap) > 0 {
 		var result []Detail
-		for k, v := range doc.DetailsMap {
+		var keys []string
+		for k := range doc.DetailsMap {
+			keys = append(keys, k)
+		}
+		sort.Strings(keys)
+
+		for _, k := range keys {
+			v := doc.DetailsMap[k]
 			valStr := fmt.Sprintf("%v", v)
 			result = append(result, Detail{
 				Key:   sanitize.SingleLine(k),
