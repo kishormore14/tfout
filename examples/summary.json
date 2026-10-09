@@ -1,0 +1,18 @@
+{
+  "schema_version": "1.0",
+  "title": "KUBERNETES INGRESS CREATED",
+  "status": "success",
+  "message": "Public ALB Ingress Controller deployed and SSL certificates attached.",
+  "theme": "default",
+  "border_style": "single",
+  "details": {
+    "Ingress Host": "app.example.com",
+    "ALB Endpoint": "k8s-default-ingress-12345678.us-east-1.elb.amazonaws.com",
+    "Target Group": "arn:aws:elasticloadbalancing:us-east-1:123456789012:targetgroup/k8s-tg/999"
+  },
+  "items": [
+    "TLS 1.3 encryption enforced",
+    "WAF rate-limiting rules enabled",
+    "Health check path /healthz responding 200 OK"
+  ]
+}

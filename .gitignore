@@ -1,0 +1,24 @@
+# Binaries
+/tfout
+/tfout.exe
+/bin/
+/dist/
+
+# Test coverage & artifacts
+*.out
+*.prof
+*.test
+coverage.txt
+
+# Terraform local cache
+.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfvars
+.terraform.lock.hcl
+
+# IDE & Editor
+.vscode/
+.idea/
+*.swp
+*~

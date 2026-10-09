@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/tfout/tfout/schema/v1/render-schema.json",
+  "title": "tfout Render Document Schema",
+  "description": "Schema definition for JSON documents formatted by 'tfout render'.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "title"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "enum": [
+        "1.0",
+        "1"
+      ],
+      "description": "Version of the tfout render schema."
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Primary banner title."
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "success",
+        "warning",
+        "error",
+        "info"
+      ],
+      "default": "info",
+      "description": "Status level determining banner color and badge."
+    },
+    "message": {
+      "type": "string",
+      "description": "Optional body text or summary message."
+    },
+    "details": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "Key-value mapping of details to present."
+    },
+    "details_list": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "key",
+          "value"
+        ],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Ordered array of key-value detail pairs."
+    },
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of bullet point items."
+    },
+    "theme": {
+      "type": "string",
+      "enum": [
+        "default",
+        "minimal",
+        "mono"
+      ],
+      "description": "Preferred visual theme."
+    },
+    "border_style": {
+      "type": "string",
+      "enum": [
+        "single",
+        "double",
+        "none"
+      ],
+      "description": "Preferred border style."
+    }
+  },
+  "additionalProperties": false
+}
