@@ -80,7 +80,7 @@ func (om OutputsMap) ConvertToBanner(dir string, cfg formatter.Config) formatter
 
 	for _, k := range keys {
 		output := om[k]
-		valStr, isSens := FormatValue(output.Value, output.Sensitive, cfg.ShowSensitive)
+		valStr, _ := FormatValue(output.Value, output.Sensitive, cfg.ShowSensitive)
 
 		if output.Sensitive {
 			sensitiveCount++
