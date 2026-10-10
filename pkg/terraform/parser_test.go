@@ -103,7 +103,7 @@ func TestFormatValueNumberFormatting(t *testing.T) {
 	}
 
 	valHuge, _ := terraform.FormatValue(1e30, false, false)
-	if valHuge != "1e+30" && valHuge != "1e+30" {
+	if valHuge != "1e+30" {
 		t.Errorf("Expected scientific float representation for huge number, got %q", valHuge)
 	}
 }

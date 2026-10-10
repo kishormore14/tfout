@@ -4,6 +4,10 @@
 /bin/
 /dist/
 
+# Local build cache
+.gocache/
+.tfout/
+
 # Test coverage & artifacts
 *.out
 *.prof

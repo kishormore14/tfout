@@ -23,12 +23,16 @@ func Text(s string, allowNewline bool) string {
 	sb.Grow(len(cleaned))
 
 	for _, r := range cleaned {
-		if r == '\n' || r == '\r' {
+		if r == '\n' {
 			if allowNewline {
 				sb.WriteRune('\n')
 			} else {
 				sb.WriteRune(' ')
 			}
+			continue
+		}
+		if r == '\r' {
+			sb.WriteRune(' ')
 			continue
 		}
 		if r == '\t' {
