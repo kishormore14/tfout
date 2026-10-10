@@ -1,0 +1,7 @@
+# Enforce LF line endings for Go source files across all platforms (Windows, Linux, macOS)
+*.go text eol=lf
+*.mod text eol=lf
+*.sum text eol=lf
+*.md text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
