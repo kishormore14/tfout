@@ -93,26 +93,26 @@ func isTTY(f *os.File) bool {
 	return (stat.Mode() & os.ModeCharDevice) != 0
 }
 
-// ANSI Escape Codes (High-Intensity Bright & 256-Color for maximum terminal compatibility)
+// ANSI Escape Codes (Standard SGR 16-Color for 100% universal shell & terminal compatibility)
 const (
 	ANSIReset      = "\x1b[0m"
 	ANSIBold       = "\x1b[1m"
 	ANSIDim        = "\x1b[2m"
-	ANSIFgGreen    = "\x1b[92m"
-	ANSIFgYellow   = "\x1b[93m"
-	ANSIFgRed      = "\x1b[91m"
-	ANSIFgCyan     = "\x1b[96m"
-	ANSIFgBlue     = "\x1b[94m"
-	ANSIFgWhite    = "\x1b[97m"
-	ANSIBgGreen    = "\x1b[48;5;34m"
-	ANSIBgYellow   = "\x1b[48;5;214m"
-	ANSIBgRed      = "\x1b[48;5;196m"
-	ANSIBgCyan     = "\x1b[48;5;33m"
+	ANSIFgGreen    = "\x1b[32m"
+	ANSIFgYellow   = "\x1b[33m"
+	ANSIFgRed      = "\x1b[31m"
+	ANSIFgCyan     = "\x1b[36m"
+	ANSIFgBlue     = "\x1b[34m"
+	ANSIFgWhite    = "\x1b[37m"
+	ANSIBgGreen    = "\x1b[42m"
+	ANSIBgYellow   = "\x1b[43m"
+	ANSIBgRed      = "\x1b[41m"
+	ANSIBgCyan     = "\x1b[44m"
 	ANSIFgBlack    = "\x1b[30m"
-	ANSIBoldGreen  = "\x1b[1;92m"
-	ANSIBoldYellow = "\x1b[1;93m"
-	ANSIBoldRed    = "\x1b[1;91m"
-	ANSIBoldCyan   = "\x1b[1;96m"
+	ANSIBoldGreen  = "\x1b[1;32m"
+	ANSIBoldYellow = "\x1b[1;33m"
+	ANSIBoldRed    = "\x1b[1;31m"
+	ANSIBoldCyan   = "\x1b[1;36m"
 )
 
 // StyleHelper formats text with optional ANSI styles.
@@ -136,24 +136,24 @@ func (s *StyleHelper) StatusBadge(status Status) string {
 	switch normalized {
 	case StatusSuccess:
 		if s.UseColor {
-			return s.Style(" ✔ SUCCESS ", ANSIBold+"\x1b[97m"+ANSIBgGreen)
+			return s.Style(" ✔ SUCCESS ", ANSIBold+"\x1b[37;42m")
 		}
 		return "[SUCCESS]"
 	case StatusWarning:
 		if s.UseColor {
-			return s.Style(" ⚠ WARNING ", ANSIBold+"\x1b[30m"+ANSIBgYellow)
+			return s.Style(" ⚠ WARNING ", ANSIBold+"\x1b[30;43m")
 		}
 		return "[WARNING]"
 	case StatusError:
 		if s.UseColor {
-			return s.Style(" ✖ ERROR ", ANSIBold+"\x1b[97m"+ANSIBgRed)
+			return s.Style(" ✖ ERROR ", ANSIBold+"\x1b[37;41m")
 		}
 		return "[ERROR]"
 	case StatusInfo:
 		fallthrough
 	default:
 		if s.UseColor {
-			return s.Style(" ℹ INFO ", ANSIBold+"\x1b[97m"+ANSIBgCyan)
+			return s.Style(" ℹ INFO ", ANSIBold+"\x1b[37;44m")
 		}
 		return "[INFO]"
 	}
