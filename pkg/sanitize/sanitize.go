@@ -88,4 +88,3 @@ func collapseSpaces(s string) string {
 	}
 	return sb.String()
 }
-

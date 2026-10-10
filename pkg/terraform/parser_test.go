@@ -107,4 +107,3 @@ func TestFormatValueNumberFormatting(t *testing.T) {
 		t.Errorf("Expected scientific float representation for huge number, got %q", valHuge)
 	}
 }
-

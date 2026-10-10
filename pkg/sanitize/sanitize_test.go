@@ -68,4 +68,3 @@ func TestMultilineSanitize(t *testing.T) {
 		t.Errorf("Multiline(%q) = %q; want %q", input, got, expected)
 	}
 }
-

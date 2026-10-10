@@ -58,7 +58,6 @@ func TestWrapTextOversizedSingleWord(t *testing.T) {
 	}
 }
 
-
 func TestRenderBanner(t *testing.T) {
 	data := formatter.BannerData{
 		Title:   "ROUTE53 HOSTED ZONE CREATED",

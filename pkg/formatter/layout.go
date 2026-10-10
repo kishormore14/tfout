@@ -117,4 +117,3 @@ func PadRight(s string, targetWidth int) string {
 	}
 	return s + strings.Repeat(" ", targetWidth-vw)
 }
-

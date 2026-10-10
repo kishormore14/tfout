@@ -122,4 +122,3 @@ func TestDeterministicDetailsOrdering(t *testing.T) {
 		t.Errorf("Details not sorted deterministically: %+v", details)
 	}
 }
-
