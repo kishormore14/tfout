@@ -13,6 +13,10 @@ var ansiDangerousRegex = regexp.MustCompile(`\x1b\][^\x07\x1b]*[\x07\x1b\\]|\x1b
 // Text strips dangerous terminal control characters from a string while preserving safe ANSI color codes.
 // If allowNewline is false, newlines (\r, \n) are replaced with spaces.
 func Text(s string, allowNewline bool) string {
+	// Convert literal \x1b and \u001b escape representations into real ASCII ESC (0x1B)
+	s = strings.ReplaceAll(s, "\\x1b", "\x1b")
+	s = strings.ReplaceAll(s, "\\u001b", "\x1b")
+
 	// Normalize CRLF to LF first to prevent double-newline conversion
 	s = strings.ReplaceAll(s, "\r\n", "\n")
 
