@@ -78,6 +78,7 @@ func Execute(args []string, stdin io.Reader, stdout io.Writer, stderr io.Writer)
 
 // Main is the standard entrypoint wrapper for os.Args.
 func Main() {
+	enableWindowsVT()
 	exitCode := Execute(os.Args[1:], os.Stdin, os.Stdout, os.Stderr)
 	os.Exit(exitCode)
 }

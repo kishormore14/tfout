@@ -136,12 +136,12 @@ func (s *StyleHelper) StatusBadge(status Status) string {
 	switch normalized {
 	case StatusSuccess:
 		if s.UseColor {
-			return s.Style(" ✔ SUCCESS ", ANSIBold+ANSIFgBlack+ANSIBgGreen)
+			return s.Style(" ✔ SUCCESS ", ANSIBold+ANSIFgWhite+ANSIBgGreen)
 		}
 		return "[SUCCESS]"
 	case StatusWarning:
 		if s.UseColor {
-			return s.Style(" ⚠ WARNING ", ANSIBold+ANSIFgBlack+ANSIBgYellow)
+			return s.Style(" ⚠ WARNING ", ANSIBold+ANSIFgWhite+ANSIBgYellow)
 		}
 		return "[WARNING]"
 	case StatusError:
@@ -153,7 +153,7 @@ func (s *StyleHelper) StatusBadge(status Status) string {
 		fallthrough
 	default:
 		if s.UseColor {
-			return s.Style(" ℹ INFO ", ANSIBold+ANSIFgBlack+ANSIBgCyan)
+			return s.Style(" ℹ INFO ", ANSIBold+ANSIFgWhite+ANSIBgCyan)
 		}
 		return "[INFO]"
 	}

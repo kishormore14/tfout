@@ -23,10 +23,11 @@ func runeWidth(r rune) int {
 	if r < 32 || (r >= 0x7F && r < 0xA0) {
 		return 0
 	}
-	// Common Emoji / Miscellaneous Symbols (e.g. ⚠, ✔, ✖, ℹ, •) and CJK ranges
-	if (r >= 0x2600 && r <= 0x27BF) || (r >= 0x1F300 && r <= 0x1F9FF) || (r >= 0x2E80 && r <= 0x9FFF) {
+	// Wide CJK characters and wide surrogate emojis occupy 2 cells
+	if (r >= 0x1F300 && r <= 0x1F9FF) || (r >= 0x2E80 && r <= 0x9FFF) {
 		return 2
 	}
+	// Standard symbols (✔, ⚠, ✖, ℹ, •) and alphanumeric runes occupy 1 cell
 	return 1
 }
 
