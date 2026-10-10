@@ -3,7 +3,6 @@ package formatter
 import (
 	"regexp"
 	"strings"
-	"unicode/utf8"
 )
 
 var stripAnsiRegex = regexp.MustCompile(`\x1b\][^\x07\x1b]*[\x07\x1b\\]|\x1b\[[0-9;]*[a-zA-Z]`)
