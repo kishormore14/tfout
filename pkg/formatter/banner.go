@@ -55,7 +55,7 @@ func RenderBanner(data BannerData, cfg Config) string {
 			return ""
 		}
 		line := leftChar + strings.Repeat(midChar, innerWidth+2) + rightChar
-		return sh.Style(line, ANSIDim)
+		return sh.Style(line, ANSIFgCyan)
 	}
 
 	// Helper for bordered lines
@@ -64,8 +64,8 @@ func RenderBanner(data BannerData, cfg Config) string {
 			return "  " + content
 		}
 		padded := PadRight(content, innerWidth)
-		left := sh.Style(border.Vertical, ANSIDim)
-		right := sh.Style(border.Vertical, ANSIDim)
+		left := sh.Style(border.Vertical, ANSIFgCyan)
+		right := sh.Style(border.Vertical, ANSIFgCyan)
 		return left + " " + padded + " " + right
 	}
 
@@ -164,7 +164,7 @@ func RenderBanner(data BannerData, cfg Config) string {
 
 		for _, item := range data.Items {
 			cleanItem := sanitize.Multiline(item)
-			itemStr := fmt.Sprintf("%s %s", sh.Style("•", ANSIBoldCyan), sh.Style(cleanItem, ANSIFgWhite))
+			itemStr := fmt.Sprintf("%s %s", sh.Style("•", ANSIBoldGreen), sh.Style(cleanItem, ANSIFgWhite))
 			for _, wrapped := range WrapText(itemStr, innerWidth) {
 				sb.WriteString(wrapBorderLine(wrapped))
 				sb.WriteString("\n")
