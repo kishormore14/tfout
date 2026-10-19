@@ -9,6 +9,11 @@ import (
 )
 
 func TestShouldUseColor(t *testing.T) {
+	// Isolate from any force-color variables in the developer/CI environment
+	for _, key := range formatter.ForceColorEnvKeys {
+		os.Unsetenv(key)
+	}
+
 	// Mono theme should never use color
 	if formatter.ShouldUseColor(formatter.ColorAlways, formatter.ThemeMono) {
 		t.Error("ShouldUseColor should return false for ThemeMono")
@@ -30,6 +35,64 @@ func TestShouldUseColor(t *testing.T) {
 
 	if formatter.ShouldUseColor(formatter.ColorAuto, formatter.ThemeDefault) {
 		t.Error("ShouldUseColor should return false when NO_COLOR is set")
+	}
+}
+
+func TestForceColorEnvOverrides(t *testing.T) {
+	for _, key := range formatter.ForceColorEnvKeys {
+		os.Unsetenv(key)
+	}
+	os.Unsetenv("NO_COLOR")
+
+	// No force-color variable present
+	if _, forced := formatter.ForceColorOverride(); forced {
+		t.Error("ForceColorOverride should not force when no force-color variable is set")
+	}
+
+	for _, key := range formatter.ForceColorEnvKeys {
+		t.Run(key+"_forces_on", func(t *testing.T) {
+			os.Setenv(key, "1")
+			defer os.Unsetenv(key)
+
+			enabled, forced := formatter.ForceColorOverride()
+			if !forced || !enabled {
+				t.Errorf("%s=1 should force colors ON, got enabled=%v forced=%v", key, enabled, forced)
+			}
+			// Piped/CI stdout (not a TTY) must still get colors in auto mode
+			if !formatter.ShouldUseColor(formatter.ColorAuto, formatter.ThemeDefault) {
+				t.Errorf("ShouldUseColor(auto) should be true when %s=1", key)
+			}
+			// Explicit opt-in must win over NO_COLOR
+			os.Setenv("NO_COLOR", "1")
+			defer os.Unsetenv("NO_COLOR")
+			if !formatter.ShouldUseColor(formatter.ColorAuto, formatter.ThemeDefault) {
+				t.Errorf("%s=1 should override NO_COLOR", key)
+			}
+			// --color never and mono theme still win
+			if formatter.ShouldUseColor(formatter.ColorNever, formatter.ThemeDefault) {
+				t.Error("ColorNever should still disable color when force env is set")
+			}
+			if formatter.ShouldUseColor(formatter.ColorAuto, formatter.ThemeMono) {
+				t.Error("Mono theme should still disable color when force env is set")
+			}
+		})
+
+		t.Run(key+"_forces_off", func(t *testing.T) {
+			os.Setenv(key, "0")
+			defer os.Unsetenv(key)
+
+			enabled, forced := formatter.ForceColorOverride()
+			if !forced || enabled {
+				t.Errorf("%s=0 should force colors OFF, got enabled=%v forced=%v", key, enabled, forced)
+			}
+			if formatter.ShouldUseColor(formatter.ColorAuto, formatter.ThemeDefault) {
+				t.Errorf("ShouldUseColor(auto) should be false when %s=0", key)
+			}
+			// Explicit --color always still wins
+			if !formatter.ShouldUseColor(formatter.ColorAlways, formatter.ThemeDefault) {
+				t.Error("ColorAlways should still enable color when force env forces off")
+			}
+		})
 	}
 }
 

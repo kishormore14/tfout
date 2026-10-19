@@ -62,7 +62,33 @@ func DefaultConfig() Config {
 	}
 }
 
-// ShouldUseColor evaluates whether ANSI colors should be emitted based on ColorMode, NO_COLOR, and theme.
+// ForceColorEnvKeys lists environment variables that force color output while in
+// ColorAuto mode, following common cross-platform conventions used by CI systems
+// (AWS CodeBuild, Jenkins, GitHub Actions) and CLI tools on cmd, PowerShell,
+// bash and zsh alike.
+var ForceColorEnvKeys = []string{"CLICOLOR_FORCE", "FORCE_COLOR"}
+
+// ForceColorOverride reports whether a force-color environment variable is
+// present and what it demands:
+//
+//	enabled=true,  forced=true  -> colors forced ON  (e.g. "1", "true")
+//	enabled=false, forced=true  -> colors forced OFF (e.g. "0", "false")
+//	enabled=false, forced=false -> no force-color variable set
+func ForceColorOverride() (enabled bool, forced bool) {
+	for _, key := range ForceColorEnvKeys {
+		v := strings.TrimSpace(os.Getenv(key))
+		if v == "" {
+			continue
+		}
+		if v == "0" || strings.EqualFold(v, "false") {
+			return false, true
+		}
+		return true, true
+	}
+	return false, false
+}
+
+// ShouldUseColor evaluates whether ANSI colors should be emitted based on ColorMode, NO_COLOR, force-color env vars, and theme.
 func ShouldUseColor(mode ColorMode, theme Theme) bool {
 	if theme == ThemeMono {
 		return false
@@ -73,11 +99,16 @@ func ShouldUseColor(mode ColorMode, theme Theme) bool {
 	if mode == ColorAlways {
 		return true
 	}
-	// ColorAuto: check NO_COLOR environment variable
+	// ColorAuto: explicit force-color request (CI/pipeline opt-in) wins over NO_COLOR,
+	// mirroring how FORCE_COLOR behaves in other CLI ecosystems.
+	if enabled, forced := ForceColorOverride(); forced {
+		return enabled
+	}
+	// ColorAuto: user opt-out via NO_COLOR
 	if noColor := os.Getenv("NO_COLOR"); noColor != "" {
 		return false
 	}
-	// Check if terminal stdout is a TTY
+	// ColorAuto: check if terminal stdout is a TTY
 	return isTTY(os.Stdout)
 }
 

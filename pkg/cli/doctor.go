@@ -46,6 +46,25 @@ func RunDoctor(stdout io.Writer) int {
 		})
 	}
 
+	for _, key := range formatter.ForceColorEnvKeys {
+		val := strings.TrimSpace(os.Getenv(key))
+		if val == "" {
+			details = append(details, formatter.DetailPair{
+				Key:   key + " Env",
+				Value: "Not set",
+			})
+			continue
+		}
+		state := "Colors forced ON"
+		if val == "0" || strings.EqualFold(val, "false") {
+			state = "Colors forced OFF"
+		}
+		details = append(details, formatter.DetailPair{
+			Key:   key + " Env",
+			Value: fmt.Sprintf("Set (%s) - %s (works without a TTY)", val, state),
+		})
+	}
+
 	termVal := os.Getenv("TERM")
 	if termVal == "" {
 		termVal = "Unset"

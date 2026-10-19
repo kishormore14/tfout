@@ -142,10 +142,54 @@ tfout version
 
 | Flag | Values | Default | Description |
 | :--- | :--- | :--- | :--- |
-| `--color` | `auto`, `always`, `never` | `auto` | Control ANSI color output. Respects `NO_COLOR` env var. |
+| `--color` | `auto`, `always`, `never` | `auto` | Control ANSI color output. Respects `NO_COLOR`, `FORCE_COLOR`, `CLICOLOR_FORCE` env vars. |
 | `--theme` | `default`, `minimal`, `mono` | `default` | Visual theme selection. `mono` uses ASCII characters. |
 | `--border` | `single`, `double`, `none` | `single` | Box border drawing style. |
 | `--show-sensitive` | boolean | `false` | Reveal Terraform sensitive output values. |
+
+---
+
+## Environment Variables (cross-platform color control)
+
+Color decisions in `--color auto` (the default) follow this precedence:
+
+**`--color` flag → force-color variables → `NO_COLOR` → TTY detection**
+
+| Variable | Effect |
+| :--- | :--- |
+| `FORCE_COLOR` / `CLICOLOR_FORCE` | Any value except `0`/`false` **forces colors on even when stdout is not a TTY** (piped output, CI logs). `0` or `false` forces colors off. |
+| `NO_COLOR` | Any non-empty value disables colors in `auto` mode. A force-color variable takes precedence over it. |
+| `TERM` | Shown by `tfout doctor` only; not used for the color decision. |
+
+This behaves identically in **cmd**, **PowerShell**, **bash/zsh on Linux/macOS**, and CI systems such as **AWS CodeBuild**, because environment variables do not depend on TTY detection:
+
+```bash
+# Linux / macOS (bash, zsh) — one-shot
+FORCE_COLOR=1 tfout outputs
+```
+
+```powershell
+# PowerShell
+$env:FORCE_COLOR = "1"
+tfout outputs
+```
+
+```bat
+:: cmd
+set FORCE_COLOR=1
+tfout outputs
+```
+
+```yaml
+# AWS CodeBuild buildspec.yml
+env:
+  variables:
+    TERM: "xterm-256color"
+    FORCE_COLOR: "1"
+    CLICOLOR_FORCE: "1"
+```
+
+Run `tfout doctor` to verify what any environment reports for these variables.
 
 ---
 
@@ -205,7 +249,7 @@ tfout banner \
 
 - `tfout outputs` requires HashiCorp Terraform binary to be installed on your system PATH.
 - `tfout` formats existing state outputs; it does not generate or execute `terraform apply`.
-- `NO_COLOR` environment variable automatically turns off color unless overridden with `--color=always`.
+- `NO_COLOR` environment variable automatically turns off color unless overridden with `--color=always` or a force-color variable (`FORCE_COLOR` / `CLICOLOR_FORCE`).
 
 ---
 
