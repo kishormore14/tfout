@@ -4,6 +4,12 @@ on:
   push:
     tags:
       - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version tag to build (e.g. v0.1.7)'
+        required: true
+        default: 'v0.1.7'
 
 permissions:
   contents: write
@@ -23,10 +29,21 @@ jobs:
         with:
           go-version: '1.21'
 
+      - name: Resolve Tag Name
+        id: resolve_tag
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            TAG="${{ github.event.inputs.version }}"
+          else
+            TAG="${GITHUB_REF#refs/tags/}"
+          fi
+          echo "TAG_NAME=${TAG}" >> "$GITHUB_ENV"
+          echo "Resolved Tag: ${TAG}"
+
       - name: Build Cross-Platform Binaries & SHA256 Checksums
         run: |
           mkdir -p dist
-          TAG_NAME="${GITHUB_REF#refs/tags/}"
+          TAG_NAME="${TAG_NAME}"
 
           PLATFORMS=(
             "linux/amd64/tfout_${TAG_NAME}_linux_amd64"
@@ -52,9 +69,18 @@ jobs:
           sha256sum * > checksums.txt
           cat checksums.txt
 
-      - name: Create GitHub Release
+      - name: Upload Build Artifacts to Actions
+        uses: actions/upload-artifact@v4
+        with:
+          name: tfout-binaries-${{ env.TAG_NAME }}
+          path: dist/*
+          retention-days: 30
+
+      - name: Create or Update GitHub Release
         uses: softprops/action-gh-release@v1
         with:
+          tag_name: ${{ env.TAG_NAME }}
+          name: Release ${{ env.TAG_NAME }}
           files: |
             dist/*
           draft: false

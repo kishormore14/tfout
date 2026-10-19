@@ -1,6 +1,7 @@
 # Binaries
 /tfout
 /tfout.exe
+tfout_*
 /bin/
 /dist/
 
